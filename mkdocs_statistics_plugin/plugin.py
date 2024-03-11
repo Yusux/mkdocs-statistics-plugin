@@ -149,7 +149,8 @@ class StatisticsPlugin(BasePlugin):
         return chinese, english, codes
     
     def _clean_markdown(self, markdown: str) -> Tuple[str, list]:
-        markdown = re.sub(r'((?<!\\)\\tikzcd(-(?P<mode>[^[\n]*))?(\[(?P<options>.*)\])?.*\n(?P<contents>(((\t|(    )).*)|\n)*))', '', markdown)
+        for target in [r'(?<!\\)\\tikzcd', r'(?<!\\)\\tikzpicture']:
+            markdown = re.sub(rf'(?P<leading>[ \t]*?)({target}(-[^[\n]*)?(\[.*\])?.*\n(((?P=leading)(\t|(    )).*)|\n)*)', '', markdown)
         codes = re.findall(r'(~~~[^\n].*?~~~|```[^\n].*?```)', markdown, re.S)
         markdown = re.sub(r'(~~~[^\n].*?~~~|```[^\n].*?```)', '', markdown, flags=re.DOTALL | re.MULTILINE)
         markdown = re.sub(r'<!--.*?-->', '', markdown, flags=re.DOTALL | re.MULTILINE)
